@@ -1,4 +1,6 @@
 #!/bin/bash
+# Author : Anand pratap singh
+# Disclaimer: Some of the repos are third party repos
 echo 'welcome to blockchain app generator with your chosen stack'
 backend="None"
 backend_sub="js"
@@ -9,6 +11,7 @@ DockerfileUiVol="/home/node/angular-seed/src"
 DockerfileUiPort="5555"
 DB='None'
 Blockchain='None'
+smart_contract_repo='truffle'
 declare -A techRepoMap
 
 
@@ -34,8 +37,18 @@ createInitialMapForRepos() {
     techRepoMap[Vue]="https://github.com/nicejade/vue-boilerplate-template.git"
 
     #blockchain
-    techRepoMap[Truffle]="https://github.com/darknightCoder/truffle-dockerized-starter.git"
+
     techRepoMap[quorum]="https://github.com/ConsenSys/quorum-docker-Nnodes.git"
+
+    # blockchain smart contract developoment setup
+    techRepoMap[Ethereum]="https://github.com/darknightCoder/truffle-dockerized-starter.git"
+    techRepoMap[quorum]="https://github.com/darknightCoder/truffle-dockerized-starter.git"
+    techRepoMap[Hyperledger]="https://github.com/darknightCoder/truffle-dockerized-starter.git"
+
+    
+ 
+
+    #smart contract development setup
 
 
     #external images
@@ -59,6 +72,7 @@ createFinalMap() {
 
     techRepoMap[blockchain]=${techRepoMap[$Blockchain]}
 
+   
     techRepoMap[ui]=${techRepoMap[$front_end]}
     if [ "$front_end" = 'Angular' ]; then
         DockerfileUi="./.docker/Dockerfile_dev"
@@ -72,11 +86,17 @@ createFinalMap() {
 
 gitPull() {
 
-  for repo in api ui ; do
+
+  for repo in api ui $smart_contract_repo; do
       echo "==> pulling : $repo repo"
       echo ${techRepoMap[$repo]}
-    #   git clone ${techRepoMap[$repo]} $repo 
+      git clone ${techRepoMap[$repo]} $repo 
   done
+
+  if [ "$Blockchain" = "Ethereum" ]; then
+      echo "==> pulling : truffle smart contract repo"
+      git clone ${techRepoMap[Ethereum]} truffle
+  fi
 }
 
 createFabricNetwork() {
@@ -125,7 +145,7 @@ EOF
 
 # for ethereum
 if [ "$Blockchain" = "Ethereum" ]; then 
-cat > docker-compose.yml <<EOF
+cat >> docker-compose.yml <<EOF
 
   truffle:
     build: ./truffle
@@ -365,4 +385,4 @@ echo Generated the docker-compose.yml for you,now starting the service for you
 if [ "$blockchain" = "Hyperledger" ]; then
 createFabricNetwork
 fi;
-# docker-compose up -d
+ docker-compose up -d
