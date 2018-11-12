@@ -33,7 +33,7 @@ createInitialMapForRepos() {
 
     #front end
     techRepoMap[Angular]="https://github.com/mgechev/angular-seed.git"
-    techRepoMap[React]="https://github.com/react-boilerplate/react-boilerplate.git"
+    techRepoMap[React]="https://github.com/darknightCoder/react-boilerplate.git"
     techRepoMap[Vue]="https://github.com/nicejade/vue-boilerplate-template.git"
 
     #blockchain
@@ -127,6 +127,7 @@ services:
     build:
       context: ./ui
       dockerfile: $DockerfileUi
+    command: npm start  
     volumes: 
       - './ui/src:$DockerfileUiVol'  
     ports:
@@ -385,4 +386,4 @@ echo Generated the docker-compose.yml for you,now starting the service for you
 if [ "$blockchain" = "Hyperledger" ]; then
 createFabricNetwork
 fi;
- docker-compose up -d
+ docker-compose up -d 
