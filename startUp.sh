@@ -54,6 +54,7 @@ createInitialMapForRepos() {
     #external images
     techRepoMap[Mongodb]="mongo:latest"
     techRepoMap[Mongodb_port]=27017
+    techRepoMap[Mongodb_url]="mongodb://db"
 
     techRepoMap[Couchdb]="couchdb"
     techRepoMap[Couchdb_port]=5984
@@ -68,6 +69,7 @@ createFinalMap() {
 
     techRepoMap[db]=${techRepoMap[$DB]}
     techRepoMap[db_port]=${techRepoMap[${DB}_port]}
+    techRepoMap[db_url]=${techRepoMap[${DB}_url]}
     echo ${techRepoMap[db_port]}
 
     techRepoMap[blockchain]=${techRepoMap[$Blockchain]}
@@ -116,7 +118,15 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    command: npm start  
+    command: npm start
+    environment:
+      PORT: 5555
+      NODE_ENV: 'PRODUCTION'
+      SERVER: ${techRepoMap[db_url]}
+      PORT_DB: ${techRepoMap[db_port]}
+      BLOCKCHAIN_HOST: http://ganache
+      BLOCKCHAIN_PORT: 8545
+      JWT_SECRET: 'secret'      
     volumes:
       - './api:/api'
     networks:
@@ -127,7 +137,9 @@ services:
     build:
       context: ./ui
       dockerfile: $DockerfileUi
-    command: npm start  
+    command: npm start
+    environment: 
+       PORT: 3001  
     volumes: 
       - './ui/src:$DockerfileUiVol'  
     ports:
@@ -137,7 +149,7 @@ services:
   db: 
     image: ${techRepoMap[db]}
     volumes:
-      - './data:/data' 
+      - './data:/data'
     ports:
       - ${techRepoMap[db_port]}:${techRepoMap[db_port]}
     networks:
