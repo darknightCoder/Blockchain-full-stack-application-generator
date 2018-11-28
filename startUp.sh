@@ -113,7 +113,14 @@ creatDockerComposeFile() {
     cat > docker-compose.yml <<EOF
 version: '3'
 services:
-
+  portainer:
+      image: portainer/portainer
+      ports:
+        - "9000:9000"
+      command: -H unix:///var/run/docker.sock
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data:/data
   api:
     build:
       context: ./api
@@ -227,7 +234,8 @@ cat >> docker-compose.yml <<EOF
 EOF
 fi;
 cat >> docker-compose.yml <<EOF
-
+volumes:
+  portainer_data:
 networks:
   blockchain_network:
     driver: bridge
@@ -278,7 +286,7 @@ do
                          backend_sub="_ts"
                          break
                          ;;
-                    "Javascipt")
+                    "Javascript")
                          echo "You have chose node with Javascript"
                          backend_sub="_js"
                          break
@@ -399,3 +407,5 @@ if [ "$blockchain" = "Hyperledger" ]; then
 createFabricNetwork
 fi;
  docker-compose up -d 
+
+
